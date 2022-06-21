@@ -5,14 +5,8 @@ import requests as r
 import pandas as pd
 from bs4 import BeautifulSoup
 from sqlalchemy import create_engine
-import os
 
-app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('SQLALCHEMY_DATABASE_URI')
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
-with app.app_context():
-    db.create_all()
+db = SQLAlchemy()
 
 
 engine = create_engine('postgresql://cnqbetrz:3cO7Dwbxef-k8cA6gaN7FjUUqnwq9La6@raja.db.elephantsql.com/cnqbetrz')
@@ -36,7 +30,7 @@ def getSpecies():
 
 
 def scrapinTime_SpeciesPage(species_list, engine):
-    species_dict = {'Name':[], 'Appearence':[], 'Patron':[], 'Client':[], 'Tech_Level':[], 'Nickname':[], 'Coalition':[], 'Image':[]}
+    species_dict = {'species_name':[], 'appearence':[], 'patron':[], 'client':[], 'tech_level':[], 'nickname':[], 'coalition':[], 'image':[]}
     for x in species_list:
         #print(x)
         my_data = r.get(f'https://expeditionary-force-by-craig-alanson.fandom.com/wiki/{x}')
@@ -97,18 +91,18 @@ def scrapinTime_SpeciesPage(species_list, engine):
         name = g_subinfo_name.get_text()
 
         #species_dict = {'Name':[], 'Appearence':[], 'Patron':[], 'Client':[], 'Tech Level':[], 'Nickname':[]}
-        species_dict['Name'].append(name)
-        species_dict['Appearence'].append(appearence)
-        species_dict['Patron'].append(patron)
-        species_dict['Client'].append(client)
-        species_dict['Tech_Level'].append(tech_level)
-        species_dict['Nickname'].append(nickname)
-        species_dict['Coalition'].append(coalition)
-        species_dict['Image'].append(s_image)
+        species_dict['species_name'].append(name)
+        species_dict['appearence'].append(appearence)
+        species_dict['patron'].append(patron)
+        species_dict['client'].append(client)
+        species_dict['tech_level'].append(tech_level)
+        species_dict['nickname'].append(nickname)
+        species_dict['coalition'].append(coalition)
+        species_dict['image'].append(s_image)
         
     df = pd.DataFrame.from_dict(species_dict)
-    df.to_sql(con=engine, name='Species', if_exists='append', index=False)
-    db.create_all()
+    df.to_sql(con=engine, name='species', if_exists='append', index=False)
+
 
 
 # def scrape_planets():
@@ -143,9 +137,9 @@ def scrape_planets2(engine):
         if x.get_text() != 'Planets / Space' and x.get_text() != 'Rahkarsh Diweln':
             planet_list.append(x.get_text())
     #print(planet_list)
-    planet_dict = {"Name":[], "Nickname":[], "OccupyingSpecies":[], "NativeSpecies":[], "PlanetData":[]}
+    planet_dict = {"name":[], "nickname":[], "species_name":[], "nativespecies":[], "planetdata":[]}
     for x in planet_list:
-        print(x)
+        #print(x)
         name = x
         planet_data = r.get(f'https://expeditionary-force-by-craig-alanson.fandom.com/wiki/{x}')
         super_soup = BeautifulSoup(planet_data.content, "html.parser")
@@ -158,7 +152,9 @@ def scrape_planets2(engine):
 
         try:
             g_grab_O_Species = g_grab_box.find(attrs={"data-source": "species2"})
-            OccupyingSpecies = g_grab_O_Species.get_text()
+            g_grab_species_name = g_grab_O_Species.find("a")
+            OccupyingSpecies = g_grab_species_name.get_text()
+            print(OccupyingSpecies)
         except:
             OccupyingSpecies = "None"
 
@@ -178,18 +174,18 @@ def scrape_planets2(engine):
             for x in g_grab_p:
                 #x.sup.decompose()
                 planetdata = x.get_text()
-                print(planetdata)
+                #print(planetdata)
         except:
             planetdata = "None"
 
         #planet_dict = {"Name":[], "Nickname":[], "OccupyingSpecies":[], "NativeSpecies":[], "PlanetData":[]}
-        planet_dict["Name"].append(name)
-        planet_dict["Nickname"].append(nickname)
-        planet_dict["OccupyingSpecies"].append(OccupyingSpecies)
-        planet_dict["NativeSpecies"].append(NativeSpecies)
-        planet_dict["PlanetData"].append(planetdata)
-    #df = pd.DataFrame.from_dict(planet_dict)
-    #df.to_sql(con=engine, name='Planets', if_exists='append', index=False)
+        planet_dict["name"].append(name)
+        planet_dict["nickname"].append(nickname)
+        planet_dict["species_name"].append(OccupyingSpecies)
+        planet_dict["nativespecies"].append(NativeSpecies)
+        planet_dict["planetdata"].append(planetdata)
+    df = pd.DataFrame.from_dict(planet_dict)
+    df.to_sql(con=engine, name='planets', if_exists='append', index=False)
         #print(name, nickname, OccupyingSpecies, NativeSpecies, planetdata)
 
 def scrape_ships(engine):
@@ -201,12 +197,16 @@ def scrape_ships(engine):
         if x.get_text() != "Spacecraft" or x.get_text() != "United Nations Navy":
             ship_list.append(x.get_text())
     
-    ship_dict = {"Shipname":[], "Shiptype":[], "Species_text":[], "ControlAI":[], "Armament":[], "Status":[], "Description":[]}
+    ship_dict = {"shipname":[], "shiptype":[], "species_name":[], "controlai":[], "armament":[], "status":[], "description":[]}
 
     for x in ship_list:
+        #print(x)
         ship_data = r.get(f'https://expeditionary-force-by-craig-alanson.fandom.com/wiki/{x}')
         super_soup = BeautifulSoup(ship_data.content, "html.parser")
         g_grab_box = super_soup.find("aside", class_="portable-infobox pi-background pi-border-color pi-theme-wikia pi-layout-default")
+        if x == 'Spacecraft' or x == 'United Nations Navy' or x == 'Types of Conveyance':
+            print(f'skipped {x}')
+            continue
         try:
             g_grab_shipname = g_grab_box.find(attrs={"data-source": "title1"})
             shipname = g_grab_shipname.get_text()
@@ -227,6 +227,7 @@ def scrape_ships(engine):
             species_text = g_grab_species_text.get_text()
         except:
             species_text = "None"
+            print(f'{x} {species_text}')
 
         try:
             g_grab_controlAI = g_grab_box.find(attrs={"data-source": "Control AI"})
@@ -263,15 +264,15 @@ def scrape_ships(engine):
             description = "None"
 
         #ship_dict = {"Shipname":[], "Shiptype":[], "Species_text":[], "ControlAI":[], "Armament":[], "Status":[], "Description":[]}
-        ship_dict['Shipname'].append(shipname)
-        ship_dict['Shiptype'].append(shiptype)
-        ship_dict['Species_text'].append(species_text)
-        ship_dict['ControlAI'].append(control_AI)
-        ship_dict['Armament'].append(armament)
-        ship_dict['Status'].append(status)
-        ship_dict['Description'].append(description)
+        ship_dict['shipname'].append(shipname)
+        ship_dict['shiptype'].append(shiptype)
+        ship_dict['species_name'].append(species_text)
+        ship_dict['controlai'].append(control_AI)
+        ship_dict['armament'].append(armament)
+        ship_dict['status'].append(status)
+        ship_dict['description'].append(description)
     df = pd.DataFrame.from_dict(ship_dict)
-    df.to_sql(con=engine, name='Ships', if_exists='append', index=False)
+    df.to_sql(con=engine, name='ships', if_exists='append', index=False)
         #print(shipname, shiptype, species_text, control_AI, armament, status, description)
         
 
@@ -326,7 +327,7 @@ def scrapeBooks(engine):
         else:
             book_list.append(sub_names.get_text())
     #print(book_list)
-    books_dict = {"Bookname":[], "Author":[], "Narrator":[], "Release":[], "Publisher":[], "RunTime":[], "Previous":[], "Next":[], "AuthorSummary":[], "Image":[]}
+    books_dict = {"bookname":[], "author":[], "narrator":[], "release":[], "publisher":[], "runtime":[], "previous":[], "next":[], "authorsummary":[], "image":[]}
     for x in book_list:
         #print(x)
         sub_data = r.get(f'https://expeditionary-force-by-craig-alanson.fandom.com/wiki/{x}')
@@ -397,18 +398,18 @@ def scrapeBooks(engine):
         #print(bookname, author, narrator, release, publisher, run_time, previous, next, author_summary, image)
 
         #books_dict = {"Bookname":[], "Author":[], "Narrator":[], "Release":[], "Publisher":[], "RunTime":[], "Previous":[], "Next":[], "AuthorSummary":[], "Image":[]}
-        books_dict["Bookname"].append(bookname)
-        books_dict["Author"].append(author)
-        books_dict["Narrator"].append(narrator)
-        books_dict["Release"].append(release)
-        books_dict["Publisher"].append(publisher)
-        books_dict["RunTime"].append(run_time)
-        books_dict["Previous"].append(previous)
-        books_dict["Next"].append(next)
-        books_dict["AuthorSummary"].append(author_summary)
-        books_dict["Image"].append(image)
+        books_dict["bookname"].append(bookname)
+        books_dict["author"].append(author)
+        books_dict["narrator"].append(narrator)
+        books_dict["release"].append(release)
+        books_dict["publisher"].append(publisher)
+        books_dict["runtime"].append(run_time)
+        books_dict["previous"].append(previous)
+        books_dict["next"].append(next)
+        books_dict["authorsummary"].append(author_summary)
+        books_dict["image"].append(image)
     df = pd.DataFrame.from_dict(books_dict)
-    df.to_sql(con=engine, name='Books', if_exists='append', index=False)
+    df.to_sql(con=engine, name='books', if_exists='append', index=False)
 
 
 def scrapeCharacters(engine):
@@ -416,6 +417,7 @@ def scrapeCharacters(engine):
     soup = BeautifulSoup(my_data.content, "html.parser")
     g_find_characters = soup.find_all("div", class_="wds-tab__content")
     character_list = []
+    ran = False
     for x in g_find_characters:
         find_a = x.find_all("a")
         for y in find_a:
@@ -430,10 +432,10 @@ def scrapeCharacters(engine):
             else:
                 character_list.append(y.get_text())
     #print(character_list)
-    character_dict = {"Name":[], "Alias":[], "Rank":[], "Affiliation":[], "Relationship":[], "Species":[], "Sex":[], "Status":[], "First_Appearence":[], "Last_Known_Location":[]}
+    character_dict = {"name":[], "alias":[], "rank":[], "affiliation":[], "relationship":[], "species_name":[], "sex":[], "status":[], "first_appearence":[], "last_known_location":[]}
     for x in character_list:
         #try:
-        #print(x)
+        print(x)
         if x == 'Captain Uhtavio "Big Score" Scorandum':
             x = "Uhtavio_Scorandum"
         elif x == 'Brevet Captain Illiath':
@@ -467,11 +469,18 @@ def scrapeCharacters(engine):
         elif x == 'Dr. Kassner':
             x = 'Dr._Kassner_(MBoP)'
         elif x == 'Dr. Zheng':
-            x = 'Dr._Zheng_(MBoP)'
+            if ran == False:
+                x = 'Dr._Zheng_(MBoP)'
+                ran = True
+            if ran == True:
+                continue
         elif x == 'Dr. Suarez':
             x = 'Dr._Suarez_(MBoP)'
         elif x == 'Dr. Reinfall':
             x = 'Dr._Reinfall_(MBoP)'
+        elif x == 'Amos Gonzales':
+            continue
+        
         sub_data = r.get(f'https://expeditionary-force-by-craig-alanson.fandom.com/wiki/{x}')
         super_soup = BeautifulSoup(sub_data.content, "html.parser")
         g_grab_aside = super_soup.find("aside")
@@ -521,6 +530,12 @@ def scrapeCharacters(engine):
             g_grab_species = g_grab_aside.find(attrs={"data-source": "species"})
             g_grab_species_div = g_grab_species.find("div", class_="pi-data-value pi-font")
             species = g_grab_species_div.get_text()
+            if species == "Human" or species == "human":
+                species = "Humans"
+            if species == "NA - Elder AI" or species == "NA - Elder AI-created":
+                species = "Elders"
+            elif species == "Elder AI (communications sub-mind)":
+                species = "Elders"
         except:
             species = "None"
 
@@ -541,9 +556,16 @@ def scrapeCharacters(engine):
         try:
             g_grab_first_appearance = g_grab_aside.find(attrs={"data-source": "first_appearance"})
             g_grab_first_appearance_div = g_grab_first_appearance.find("div", class_="pi-data-value pi-font")
-            first_appearance = g_grab_first_appearance_div.get_text()
+            g_grab_first_appearence_a = g_grab_first_appearance_div.find("a")
+            first_appearance = g_grab_first_appearence_a.get_text()
+            if first_appearance == "Book 2: Spec Ops":
+                first_appearance = "ExForce 2: Spec Ops"
+            elif first_appearance == "ExForce 3.5: Trouble on Paradise":
+                first_appearance = "Book 3.5: Trouble on Paradise (Novella)"
+            
+            
         except:
-            first_appearance = "None"
+            first_appearance = "ExForce 1: Columbus Day"
         
         try:
             g_grab_last_known_location = g_grab_aside.find(attrs={"data-source": "last_known_location"})
@@ -553,23 +575,23 @@ def scrapeCharacters(engine):
             last_known_location = "None"
         
         #character_dict = {"Name":[], "Alias":[], "Rank":[], "Affiliation":[], "Relationship":[], "Species":[], "Sex":[], "Status":[], "First_Appearence":[], "Last_Known_Location":[]}
-        character_dict["Name"].append(f'{firstname} {lastname}')
-        character_dict["Alias"].append(alias)
-        character_dict["Rank"].append(rank)
-        character_dict["Affiliation"].append(affiliation)
-        character_dict["Relationship"].append(relationship)
-        character_dict["Species"].append(species)
-        character_dict["Sex"].append(sex)
-        character_dict["Status"].append(status)
-        character_dict["First_Appearence"].append(first_appearance)
-        character_dict["Last_Known_Location"].append(last_known_location)
+        character_dict["name"].append(f'{firstname} {lastname}')
+        character_dict["alias"].append(alias)
+        character_dict["rank"].append(rank)
+        character_dict["affiliation"].append(affiliation)
+        character_dict["relationship"].append(relationship)
+        character_dict["species_name"].append(species)
+        character_dict["sex"].append(sex)
+        character_dict["status"].append(status)
+        character_dict["first_appearence"].append(first_appearance)
+        character_dict["last_known_location"].append(last_known_location)
     df = pd.DataFrame.from_dict(character_dict)
-    df.to_sql(con=engine, name='Characters', if_exists='append', index=False)
+    df.to_sql(con=engine, name='characters', if_exists='append', index=False)
 
 #scrapeCharacters(engine)
 #scrapeBooks(engine)
 #scrapeFactions()
-#scrape_ships(engine)
+scrape_ships(engine)
 #scrape_planets2(engine)
 #scrape_planets()
-scrapinTime_SpeciesPage(getSpecies(), engine)
+#scrapinTime_SpeciesPage(getSpecies(), engine)
