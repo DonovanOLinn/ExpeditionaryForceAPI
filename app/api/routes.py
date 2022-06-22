@@ -55,13 +55,25 @@ def getShips():
     ships = [sh.to_dict() for sh in ships]
     return jsonify(ships), 200
 
-@api.route('/Specific', methods=['GET'])
-def getspecificspecies():
+@api.route('Species/all/<string:name>', methods=['GET'])
+def getspecificspecies(name):
     print('start')
-    my_filter = Characters.query.filter(Characters.species_name == 'Humans').all()
-    my_ships = Ships.query.filter(Ships.species_name == 'Humans').all()
+    my_filter = Characters.query.filter(Characters.species_name == name).all()
+    my_ships = Ships.query.filter(Ships.species_name == name).all()
+    my_species = Species.query.filter(Species.species_name == name).all()
+    my_planets = Planets.query.filter(Planets.species_name == name).all()
     #my_filter = Species.query.all()
     my_filter = [sp.to_dict() for sp in my_filter]
     my_ships = [sh.to_dict() for sh in my_ships]
-    return jsonify(my_filter, my_ships), 200
+    my_species = [ch.to_dict() for ch in my_species]
+    my_planets = [pl.to_dict() for pl in my_planets]
+    return jsonify(my_filter, my_ships, my_species, my_planets), 200
     #return render_template('api_base.html'), 200
+
+
+@api.route('character/<string:name>', methods=['GET'])
+def getspecificcharacter(name):
+    print('start')
+    my_char = Characters.query.filter(Characters.name == name).all()
+    my_char = [ch.to_dict() for ch in my_char]
+    return jsonify(my_char), 200

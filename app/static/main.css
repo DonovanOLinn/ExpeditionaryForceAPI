@@ -1,0 +1,31 @@
+#Title-Image {
+    width: auto;
+    height: 300px;
+    margin: 20px;
+}
+
+#Header {
+    background-color: rgb(231, 231, 231);
+    margin-bottom: 10px;
+}
+
+#Title-Paragraph{
+    margin: 20px;
+    font-size: 19px;
+}
+
+#input-1{
+    margin: 30px;
+}
+
+#input-2{
+    margin: 30px;
+}
+
+#API-Title2{
+    margin: 30px;
+}
+
+#Navbar{
+    background-color: rgb(95, 155, 179)
+}
