@@ -81,6 +81,21 @@ def getspecificcharacter(name):
 @api.route('ship/<string:name>', methods=['GET'])
 def getspecificship(name):
     print('start')
-    my_ship = Ships.query.filter(Ships.name == name).all()
+    my_ship = Ships.query.filter(Ships.shipname == name).all()
     my_ship = [sh.to_dict() for sh in my_ship]
     return jsonify(my_ship), 200
+
+@api.route('planet/<string:name>', methods=['GET'])
+def getspecificplanet(name):
+    print('start')
+    my_planet = Planets.query.filter(Planets.name == name).all()
+    my_planet = [sh.to_dict() for sh in my_planet]
+    return jsonify(my_planet), 200
+
+@api.route('book/<string:name>', methods=['GET'])
+def getspecificbook(name):
+    print('start')
+    my_book = Books.query.filter(Books.bookname == name).all()
+    my_book = [sh.to_dict() for sh in my_book]
+    return jsonify(my_book), 200
+

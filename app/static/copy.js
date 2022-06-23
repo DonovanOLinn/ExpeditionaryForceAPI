@@ -25,5 +25,12 @@ function copytxt4() {
     let copyText = document.getElementById("Ship-filter-url")
     copyText.select();
     copyText.setSelectionRange(0,99999);
-    navigator.clipboard.writeText("https://exfor-api.herokuapp.com/api/character/" + copyText.value)
+    navigator.clipboard.writeText("https://exfor-api.herokuapp.com/api/ship/" + copyText.value)
+}
+
+function copytxt5() {
+    let copyText = document.getElementById("planet-filter-url")
+    copyText.select();
+    copyText.setSelectionRange(0,99999);
+    navigator.clipboard.writeText("https://exfor-api.herokuapp.com/api/planet/" + copyText.value)
 }
