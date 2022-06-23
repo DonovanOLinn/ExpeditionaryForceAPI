@@ -77,3 +77,10 @@ def getspecificcharacter(name):
     my_char = Characters.query.filter(Characters.name == name).all()
     my_char = [ch.to_dict() for ch in my_char]
     return jsonify(my_char), 200
+
+@api.route('ship/<string:name>', methods=['GET'])
+def getspecificship(name):
+    print('start')
+    my_ship = Ships.query.filter(Ships.name == name).all()
+    my_ship = [sh.to_dict() for sh in my_ship]
+    return jsonify(my_ship), 200

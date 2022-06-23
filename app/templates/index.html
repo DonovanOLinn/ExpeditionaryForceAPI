@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Expeditionary Force API</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" 
     integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
     <script src="static/copy.js" defer></script>
@@ -31,7 +31,7 @@
         </h2>
         <div class="input-group mb-3" id="input-1">
             <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon3">https://127.0.0.1:5000/api</span>
+                <span class="input-group-text" id="basic-addon3">https://exfor-api.herokuapp.com/api</span>
             </div>
             <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3" placeholder="Try typing one of these categories: Species, Ships, Characters, Planets, Books">
             <div class="input-group-append">
@@ -43,7 +43,7 @@
         <h2 id="API-Title2">Or, would you like to view everything a species has to offer?</h2>
         <div class="input-group mb-3" id="input-2">
             <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon3">https://127.0.0.1:5000/api/Species/all</span>
+                <span class="input-group-text" id="basic-addon3">https://exfor-api.herokuapp.com/api/Species/all</span>
             </div>
             <input type="text" class="form-control" id="Species-filter-url" aria-describedby="basic-addon3" placeholder="Try typing a species name such as: Jeraptha, Humans, or Maxolhx" >
             <div class="input-group-append">
@@ -54,11 +54,22 @@
         <h2 id="API-Title2">Or, would you like to view a specific character?</h2>
         <div class="input-group mb-3" id="input-2">
             <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon3">https://127.0.0.1:5000/api/character/</span>
+                <span class="input-group-text" id="basic-addon3">https://exfor-api.herokuapp.com/api/character/</span>
             </div>
             <input type="text" class="form-control" id="Character-filter-url" aria-describedby="basic-addon3" placeholder="Try a character like Joseph Bishop or Uhtavio Scorandum" >
             <div class="input-group-append">
                 <button  onclick="copytxt3()" class="btn btn-outline-secondary" type="button">Copy</button>
+            </div>
+        </div>
+
+        <h2 id="API-Title2">Or ship?</h2>
+        <div class="input-group mb-3" id="input-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon3">https://exfor-api.herokuapp.com/api/ship/</span>
+            </div>
+            <input type="text" class="form-control" id="Ship-filter-url" aria-describedby="basic-addon3" placeholder="Try a ship like Valkyrie v1.0, or Will Do Sketchy Things" >
+            <div class="input-group-append">
+                <button  onclick="copytxt4()" class="btn btn-outline-secondary" type="button">Copy</button>
             </div>
         </div>
 
