@@ -1,12 +1,34 @@
-from os import stat
 from flask_sqlalchemy import SQLAlchemy
 from uuid import uuid4
 from sqlalchemy import ForeignKey
 from werkzeug.security import generate_password_hash
 from datetime import datetime
+from flask_login import LoginManager, UserMixin
 
 
 db = SQLAlchemy()
+login = LoginManager()
+
+@login.user_loader
+def load_user(userid):
+    return User.query.get(userid)
+
+class User(db.Model, UserMixin):
+    id = db.Column(db.String(80), primary_key=True)
+    username = db.Column(db.String(100), nullable=False, unique=True)
+    email = db.Column(db.String(100), nullable=False, unique=True)
+    password =db.Column(db.String(250), nullable=False)
+    first_name = db.Column(db.String(100))
+    last_name = db.Column(db.String(100))
+    date_created = db.Column(db.DateTime, default=datetime.utcnow())
+
+    def __init__(self, username, email, password, first_name='', last_name=''):
+        self.username = username
+        self.email = email.lower()
+        self.first_name = first_name.title()
+        self.last_name = last_name.title()
+        self.id = str(uuid4())
+        self.password = generate_password_hash(password) 
 
 
 class Species(db.Model):
@@ -95,7 +117,7 @@ class Characters(db.Model):
     rank = db.Column(db.String)
     affiliation = db.Column(db.String)
     relationship = db.Column(db.String)
-    species_name = db.Column(db.String, db.ForeignKey('Species.species_name'))
+    species_name = db.Column(db.String)
     sex = db.Column(db.String)
     status = db.Column(db.String)
     first_appearence = db.Column(db.String)
@@ -162,7 +184,7 @@ class Planets(db.Model):
 class Ships(db.Model):
     shipname = db.Column(db.String, primary_key=True)
     shiptype = db.Column(db.String)
-    species_name = db.Column(db.String, db.ForeignKey('Species.species_name'))
+    species_name = db.Column(db.String)
     controlai = db.Column(db.String)
     armament = db.Column(db.String)
     status = db.Column(db.String)
