@@ -28,7 +28,7 @@ async def on_message(message):
 	isSpecies = True
 	try:
 		if message.content.startswith("!"):
-			data = r.get(f'http://127.0.0.1:5000/api/character/{message.content[1::]}')
+			data = r.get(f'https://exfor-api.herokuapp.com/api/character/{message.content[1::]}')
 			if data.status_code == 200:
 				data = data.json()
 		
@@ -43,7 +43,7 @@ async def on_message(message):
 	if isChar == False:
 		try:
 			if message.content.startswith("!"):
-				data = r.get(f'http://127.0.0.1:5000/api/ship/{message.content[1::]}')
+				data = r.get(f'https://exfor-api.herokuapp.com/api/ship/{message.content[1::]}')
 				if data.status_code == 200:
 					data = data.json()
 				
@@ -58,7 +58,7 @@ async def on_message(message):
 	if isShip == False:
 		try:
 			if message.content.startswith("!"):
-				data = r.get(f'http://127.0.0.1:5000/api/planet/{message.content[1::]}')
+				data = r.get(f'https://exfor-api.herokuapp.com/api/planet/{message.content[1::]}')
 				if data.status_code == 200:
 					data = data.json()
 				
@@ -72,7 +72,7 @@ async def on_message(message):
 	if isPlanet == False:
 		try:
 			if message.content.startswith("!"):
-				data = r.get(f'http://127.0.0.1:5000/api/book/{message.content[1::]}')
+				data = r.get(f'https://exfor-api.herokuapp.com/api/book/{message.content[1::]}')
 				if data.status_code == 200:
 					data = data.json()
 				
@@ -87,7 +87,7 @@ async def on_message(message):
 	if isBook == False:
 		try:
 			if message.content.startswith("!"):
-				data = r.get(f'http://127.0.0.1:5000/api/Species/{message.content[1::]}')
+				data = r.get(f'https://exfor-api.herokuapp.com/api/Species/{message.content[1::]}')
 				if data.status_code == 200:
 					data = data.json()
 				print('test')
